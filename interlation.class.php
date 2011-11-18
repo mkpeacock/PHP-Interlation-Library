@@ -163,16 +163,16 @@ class Interlace {
 	
 	/**
 	 * Generate an interlaced array and fill for all timestamps within the range of _first_ to _last_
+	 * - assumes master key is a timestamp!
 	 * @param String $keyField
 	 * @param String $valueField
 	 * @return array
 	 */
 	public function generateAndFill( $keyField, $valueField )
 	{
-		$this->first = $this->getFirst( $keyField );
-		$this->last = $this->getLast( $keyField );
+		$this->first = strtotime( $this->getFirst( $keyField ) );
+		$this->last = strtotime( $this->getLast( $keyField ) );
 		$this->populateKeysFromField( $keyField );
-		
 		$previousValues = array_keys( $this->arrays );
 		for( $i = $this->first; $i <= $this->last; $i++ )
 		{
@@ -180,10 +180,11 @@ class Interlace {
 			
 			foreach( $this->arrays as $key => $array )
 			{
-				
-				if( isset( $array[ $i ] ) )
+				$d = date('Y-m-d H:i:s', $i );
+				$interlation[ $key ] = array();
+				if( isset( $array[ $d ] ) )
 				{
-					$previousValues[ $key ] = $array[ $i ][ $valueField ];
+					$previousValues[ $key ] = $array[ $d ][ $valueField ];
 				}
 				elseif( ! isset( $previousValues[ $key ] ) )
 				{
@@ -194,7 +195,7 @@ class Interlace {
 			}
 			
 	
-			$this->interlaced[ $i ] = $interlation;
+			$this->interlaced[ $d ] = $interlation;
 		}
 		
 		
